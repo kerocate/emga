@@ -5,7 +5,6 @@ static lv_disp_t *disp;
 
 static lv_disp_drv_t disp_drv; /*A variable to hold the drivers. Must be static or global.*/
 static lv_disp_draw_buf_t disp_buf;
-// static lv_color_t buf1[SCREEN_WIDTH * 10],buf2[SCREEN_WIDTH * 10];
 static lv_color_t buf1[SCREEN_WIDTH * SCREEN_HEIGHT], buf2[SCREEN_WIDTH * SCREEN_HEIGHT];
 
 static lv_indev_drv_t indev_drv;
@@ -16,7 +15,7 @@ static lv_fs_res_t res;
 static char files[256][256];
 
 #include "call_backs.h"
-#include "layout/base.h"
+#include "layout/base_layout.h"
 
 void open_path()
 {
@@ -68,12 +67,9 @@ int main(int argc, char const *argv[])
     // Register the display
     /*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL instead buf_2 */
     lv_disp_drv_init(&disp_drv); /*Basic initialization*/
-    // disp_drv.direct_mode = 1;
     disp_drv.full_refresh = 1;
 
-    // lv_disp_draw_buf_init(&disp_buf, buf1, buf2, SCREEN_WIDTH * 10);
     lv_disp_draw_buf_init(&disp_buf, buf1, buf2, SCREEN_WIDTH * SCREEN_HEIGHT);
-    // lv_disp_draw_buf_init(&disp_buf, buf1, NULL, SCREEN_WIDTH * SCREEN_HEIGHT);
 
     disp_drv.draw_buf = &disp_buf; /*Set an initialized buffer*/
     disp_drv.flush_cb = flush_cb;  /*Set a flush callback to draw to the display*/
@@ -81,10 +77,6 @@ int main(int argc, char const *argv[])
     disp_drv.ver_res = vinfo.yres; /*Set the vertical resolution in pixels*/
 
     disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
-
-    // lv_disp_t *disp = lv_disp_create(vinfo.xres, vinfo.yres);
-    // lv_disp_set_flush_cb(disp, flush_cb);
-    // lv_disp_set_draw_buffers(disp, buf1, buf2, sizeof(buf1), LV_DISP_RENDER_MODE_PARTIAL);
 
     // Register the touch plane
     lv_indev_drv_init(&indev_drv); /*Basic initialization*/
@@ -114,54 +106,20 @@ int main(int argc, char const *argv[])
     // todo: file system
     open_path();
     read_all_files();
+    
+    //--------------------- UI -----------------------//
+    //?style here
+    init_base_style();
 
-    // todo: UI here
-    // base_layout();
+    //?layout here
+    base_layout();
 
-    lv_obj_t *cont = lv_obj_create(lv_scr_act());
-    lv_obj_remove_style_all(cont);
-    lv_obj_set_size(cont, 800, 480);
-    lv_obj_center(cont);
-
-    // lv_example_scroll_2();
-    // lv_example_monkey_1();
-    lv_example_anim_1(cont);
-    lv_example_obj_2(cont);
-
-    // lv_obj_t *btn = lv_btn_create(lv_scr_act());
-    // lv_obj_add_event(btn, my_event_cb, LV_EVENT_CLICKED, NULL); /*Assign an event callback*/
-
-    // lv_timer_del(disp->refr_timer);
-    // disp->refr_timer = NULL;
-
-    // pthread_join(mythread1, NULL);
+    //--------------------- UI -----------------------//
 
     while (1)
     {
         lv_timer_handler_run_in_period(8);
         usleep(8 * 1000); /*Sleep for 5 millisecond*/
-        // lv_tick_inc(10);   /*Tell LVGL that 5 milliseconds were elapsed*/
-        // lv_timer_handler();
-        // usleep(10 * 1000); /*Sleep for 5 millisecond*/
-        // lv_tick_inc(40);
-        // lv_timer_handler();
-        // lv_timer_t *timer = lv_indev_get_read_timer(disp);
-        // lv_indev_read_timer_cb(timer);
-        // lv_timer_handler();
-        // lv_timer_handler();
-        // printf("loop\n\n");
-        // usleep(5 * 1000); /* delay 5ms to avoid unnecessary polling */
-        // lv_tick_inc(5);
-        // lv_timer_handler(); /* run lv_timer_handler() every 5ms */
-
-        // usleep(5 * 1000); /* delay 5ms to avoid unnecessary polling */
-        // lv_obj_update_layout(lv_scr_act());
-        // _lv_disp_refr_timer(NULL);
-        // pthread_join(&mythread1, NULL);
-        // _lv_disp_refr_timer(NULL);
-        // flush_cb(disp,)
-        // read(tc_fd, &tc_ev, sizeof(tc_ev));
-        // printf("time: %ld ms, type: %d, code: %d, data: %d \n", tc_ev.time.tv_usec, tc_ev.type, tc_ev.code, tc_ev.value);
     }
 
     close_path();
