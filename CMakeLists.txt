@@ -9,7 +9,7 @@ enable_testing()
 
 add_subdirectory(lvgl)
 add_executable(emga main.c)
-add_compile_options(-std=gnu11)
+add_compile_options(-std=gnu17)
 
 # Specify path to own LVGL config header
 set(LV_CONF_PATH
@@ -19,6 +19,7 @@ CACHE STRING "" FORCE)
 # The target "MyFirmware" depends on LVGL
 target_link_libraries(emga PRIVATE lvgl)
 target_link_libraries(emga PRIVATE Threads::Threads)
+# target_link_libraries(emga PRIVATE m)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

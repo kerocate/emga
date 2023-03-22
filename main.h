@@ -28,7 +28,7 @@ struct input_event tc_ev;
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 
-static pthread_mutex_t lvgl_mutex;
+// static pthread_mutex_t lvgl_mutex;
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 480
@@ -41,7 +41,7 @@ static size_t open_framebuffer_device(void)
         perror("Error: cannot open framebuffer device");
         // exit(0x10);
     }
-
+    ioctl(fd, FIONBIO, 1);
     if (ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) == -1)
     {
         perror("Error: cannot get variable screen info");

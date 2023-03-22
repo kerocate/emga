@@ -3,12 +3,11 @@
 
 static lv_disp_drv_t disp_drv; /*A variable to hold the drivers. Must be static or global.*/
 static lv_disp_draw_buf_t disp_buf;
-// static lv_color_t buf1[SCREEN_WIDTH * 10];
-static lv_color_t buf1[SCREEN_WIDTH * SCREEN_HEIGHT];
-static lv_color_t buf2[SCREEN_WIDTH * 10];
+// static lv_color_t buf1[SCREEN_WIDTH * 10],buf2[SCREEN_WIDTH * 10];
+static lv_color_t buf1[SCREEN_WIDTH * SCREEN_HEIGHT], buf2[SCREEN_WIDTH * SCREEN_HEIGHT];
 
 static lv_indev_drv_t indev_drv;
-lv_indev_t *indev_touchpad;
+static lv_indev_t *indev_touchpad;
 
 static lv_fs_dir_t dir;
 static lv_fs_res_t res;
@@ -57,7 +56,7 @@ void read_all_files()
 
 int main(int argc, char const *argv[])
 {
-    pthread_t mythread1;
+    pthread_t mythread1, render;
 
     // ?: lvint->lvtick->lvdata->lvdraw
     lv_init();
@@ -67,9 +66,13 @@ int main(int argc, char const *argv[])
     // Register the display
     /*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL instead buf_2 */
     lv_disp_drv_init(&disp_drv); /*Basic initialization*/
-    disp_drv.direct_mode = 1;
+    // disp_drv.direct_mode = 1;
+    disp_drv.full_refresh = 1;
+
     // lv_disp_draw_buf_init(&disp_buf, buf1, buf2, SCREEN_WIDTH * 10);
-    lv_disp_draw_buf_init(&disp_buf, buf1, NULL, SCREEN_WIDTH * SCREEN_HEIGHT);
+    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, SCREEN_WIDTH * SCREEN_HEIGHT);
+    // lv_disp_draw_buf_init(&disp_buf, buf1, NULL, SCREEN_WIDTH * SCREEN_HEIGHT);
+
     disp_drv.draw_buf = &disp_buf; /*Set an initialized buffer*/
     disp_drv.flush_cb = flush_cb;  /*Set a flush callback to draw to the display*/
     disp_drv.hor_res = vinfo.xres; /*Set the horizontal resolution in pixels*/
@@ -93,7 +96,14 @@ int main(int argc, char const *argv[])
     lv_group_add_obj(group, lv_scr_act());
     lv_indev_set_group(indev_touchpad, group);
 
-    // int res = pthread_create(&mythread1, NULL, tick_thread, NULL);
+    int res = pthread_create(&mythread1, NULL, tick_thread, NULL);
+    if (res != 0)
+    {
+        printf("thread create faild! \n");
+        // exit(0x20);
+    }
+
+    // res = pthread_create(&render, NULL, render_flush, NULL);
     // if (res != 0)
     // {
     //     printf("thread create faild! \n");
@@ -112,17 +122,22 @@ int main(int argc, char const *argv[])
     // lv_obj_set_size(cont, 800, 480);
     // lv_obj_center(cont);
 
-    lv_example_scroll_2();
+    // lv_example_scroll_2();
+    lv_example_anim_1();
+    lv_example_obj_2();
 
     // lv_obj_t *btn = lv_btn_create(lv_scr_act());
     // lv_obj_add_event(btn, my_event_cb, LV_EVENT_CLICKED, NULL); /*Assign an event callback*/
 
+    // lv_timer_del(disp->refr_timer);
+    // disp->refr_timer = NULL;
+
     while (1)
     {
-        usleep(10 * 1000);                  /*Sleep for 5 millisecond*/
-        lv_tick_inc(10);                    /*Tell LVGL that 5 milliseconds were elapsed*/
-        lv_timer_handler_run_in_period(10); /* run lv_timer_handler() every 5ms */
-        // usleep(5 * 1000);                  /* delay 5ms to avoid unnecessary polling */
+        // lv_timer_handler(); /* run lv_timer_handler() every 5ms */
+        // usleep(40 * 1000); /* delay 5ms to avoid unnecessary polling */
+        // pthread_join(&mythread1, NULL);
+        // _lv_disp_refr_timer(NULL);
         // flush_cb(disp,)
         // read(tc_fd, &tc_ev, sizeof(tc_ev));
         // printf("time: %ld ms, type: %d, code: %d, data: %d \n", tc_ev.time.tv_usec, tc_ev.type, tc_ev.code, tc_ev.value);
