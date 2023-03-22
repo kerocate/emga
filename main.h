@@ -7,6 +7,9 @@
 #include <errno.h>
 #include <pthread.h>
 
+#include <signal.h> /* Definition of SIGEV_* constants */
+#include <time.h>
+
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
@@ -35,7 +38,7 @@ struct fb_fix_screeninfo finfo;
 
 static size_t open_framebuffer_device(void)
 {
-    int fd = open("/dev/fb0", O_RDWR);
+    int fd = open("/dev/fb0", O_RDWR | O_ASYNC | O_NONBLOCK);
     if (fd == -1)
     {
         perror("Error: cannot open framebuffer device");
@@ -70,15 +73,16 @@ static void close_framebuffer_device(size_t screensize)
 
 static void open_touch()
 {
-    tc_fd = open("/dev/input/event0", O_RDWR);
+    tc_fd = open("/dev/input/event0", O_RDWR | O_ASYNC | O_NONBLOCK);
     if (tc_fd < 0)
     {
         printf("open touch fail!\n");
         // exit(0x13);
     }
-    ioctl(tc_fd, FIONBIO, 1);
+    // ioctl(tc_fd, FIONBIO, 1);
 }
 
-static void close_touch(){
+static void close_touch()
+{
     close(tc_fd);
 }

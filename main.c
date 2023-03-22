@@ -1,6 +1,8 @@
 #include "main.h"
 #include "lvgl/lvgl.h"
 
+static lv_disp_t *disp;
+
 static lv_disp_drv_t disp_drv; /*A variable to hold the drivers. Must be static or global.*/
 static lv_disp_draw_buf_t disp_buf;
 // static lv_color_t buf1[SCREEN_WIDTH * 10],buf2[SCREEN_WIDTH * 10];
@@ -56,7 +58,7 @@ void read_all_files()
 
 int main(int argc, char const *argv[])
 {
-    pthread_t mythread1, render;
+    pthread_t mythread1;
 
     // ?: lvint->lvtick->lvdata->lvdraw
     lv_init();
@@ -78,7 +80,6 @@ int main(int argc, char const *argv[])
     disp_drv.hor_res = vinfo.xres; /*Set the horizontal resolution in pixels*/
     disp_drv.ver_res = vinfo.yres; /*Set the vertical resolution in pixels*/
 
-    lv_disp_t *disp;
     disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
 
     // lv_disp_t *disp = lv_disp_create(vinfo.xres, vinfo.yres);
@@ -117,14 +118,15 @@ int main(int argc, char const *argv[])
     // todo: UI here
     // base_layout();
 
-    // lv_obj_t *cont = lv_obj_create(lv_scr_act());
-    // lv_obj_remove_style_all(cont);
-    // lv_obj_set_size(cont, 800, 480);
-    // lv_obj_center(cont);
+    lv_obj_t *cont = lv_obj_create(lv_scr_act());
+    lv_obj_remove_style_all(cont);
+    lv_obj_set_size(cont, 800, 480);
+    lv_obj_center(cont);
 
     // lv_example_scroll_2();
-    lv_example_anim_1();
-    lv_example_obj_2();
+    // lv_example_monkey_1();
+    lv_example_anim_1(cont);
+    lv_example_obj_2(cont);
 
     // lv_obj_t *btn = lv_btn_create(lv_scr_act());
     // lv_obj_add_event(btn, my_event_cb, LV_EVENT_CLICKED, NULL); /*Assign an event callback*/
@@ -132,10 +134,29 @@ int main(int argc, char const *argv[])
     // lv_timer_del(disp->refr_timer);
     // disp->refr_timer = NULL;
 
+    // pthread_join(mythread1, NULL);
+
     while (1)
     {
+        lv_timer_handler_run_in_period(8);
+        usleep(8 * 1000); /*Sleep for 5 millisecond*/
+        // lv_tick_inc(10);   /*Tell LVGL that 5 milliseconds were elapsed*/
+        // lv_timer_handler();
+        // usleep(10 * 1000); /*Sleep for 5 millisecond*/
+        // lv_tick_inc(40);
+        // lv_timer_handler();
+        // lv_timer_t *timer = lv_indev_get_read_timer(disp);
+        // lv_indev_read_timer_cb(timer);
+        // lv_timer_handler();
+        // lv_timer_handler();
+        // printf("loop\n\n");
+        // usleep(5 * 1000); /* delay 5ms to avoid unnecessary polling */
+        // lv_tick_inc(5);
         // lv_timer_handler(); /* run lv_timer_handler() every 5ms */
-        // usleep(40 * 1000); /* delay 5ms to avoid unnecessary polling */
+
+        // usleep(5 * 1000); /* delay 5ms to avoid unnecessary polling */
+        // lv_obj_update_layout(lv_scr_act());
+        // _lv_disp_refr_timer(NULL);
         // pthread_join(&mythread1, NULL);
         // _lv_disp_refr_timer(NULL);
         // flush_cb(disp,)

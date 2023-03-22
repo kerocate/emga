@@ -11,8 +11,13 @@ static void *tick_thread(void *args)
 {
     while (1)
     {
-        usleep(5 * 1000); /*Sleep for 5 millisecond*/
-        lv_tick_inc(5);   /*Tell LVGL that 5 milliseconds were elapsed*/
+        usleep(8 * 1000); /*Sleep for 5 millisecond*/
+        lv_tick_inc(8);   /*Tell LVGL that 5 milliseconds were elapsed*/
+        // lv_timer_handler();
+        // lv_timer_handler();
+        // timer_start();     /*Restart the timer where lv_tick_inc() is called*/
+        // lv_task_handler(); /*Call `lv_task_handler()` manually to process the wake-up event*/
+        // lv_obj_update_layout(lv_scr_act());
     }
 }
 
@@ -57,17 +62,20 @@ static void touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
     // printf("type: %d ", tc_ev.type);
     // printf("code: %d ", tc_ev.code);
     // printf("value: %d\n\n", tc_ev.value);
-    if (n < sizeof(tc_ev))
-    {
-        return;
-    }
+    // if (n < sizeof(tc_ev))
+    // {
+    //     return;
+    // }
     if (tc_ev.type == 0)
     {
         if (pressed == 1)
         {
             data->state = LV_INDEV_STATE_PR;
         }
-        return;
+        else
+        {
+            data->state = LV_INDEV_STATE_REL;
+        }
     }
     if (tc_ev.type == EV_KEY)
     {
@@ -113,11 +121,11 @@ static void touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
     // data->continue_reading = true;
 }
 
-static void *render_flush(void *args)
-{
-    usleep(40 * 1000); /* delay 5ms to avoid unnecessary polling */
-    _lv_disp_refr_timer(NULL);
-}
+// static void *render_flush(void *args)
+// {
+//     usleep(40 * 1000); /* delay 5ms to avoid unnecessary polling */
+//     _lv_disp_refr_timer(NULL);
+// }
 
 static void drag_event_handler(lv_event_t *e)
 {
@@ -138,10 +146,10 @@ static void drag_event_handler(lv_event_t *e)
 /**
  * Make an object dragable.
  */
-void lv_example_obj_2(void)
+void lv_example_obj_2(lv_obj_t *anc)
 {
     lv_obj_t *obj;
-    obj = lv_obj_create(lv_scr_act());
+    obj = lv_obj_create(anc);
     lv_obj_set_size(obj, 150, 100);
     lv_obj_add_event_cb(obj, drag_event_handler, LV_EVENT_PRESSING, NULL);
 
@@ -187,14 +195,28 @@ static void sw_event_cb(lv_event_t *e)
 /**
  * Start animation on an event
  */
-void lv_example_anim_1(void)
+void lv_example_anim_1(lv_obj_t *anc)
 {
-    lv_obj_t *label = lv_label_create(lv_scr_act());
+    lv_obj_t *label = lv_label_create(anc);
     lv_label_set_text(label, "Hello animations!");
     lv_obj_set_pos(label, 100, 10);
 
-    lv_obj_t *sw = lv_switch_create(lv_scr_act());
+    lv_obj_t *sw = lv_switch_create(anc);
     lv_obj_center(sw);
     lv_obj_add_state(sw, LV_STATE_CHECKED);
     lv_obj_add_event_cb(sw, sw_event_cb, LV_EVENT_VALUE_CHANGED, label);
 }
+
+// void lv_example_monkey_1(void)
+// {
+//     /*Create pointer monkey test*/
+//     lv_monkey_config_t config;
+//     lv_monkey_config_init(&config);
+//     config.type = LV_INDEV_TYPE_KEYPAD;
+//     config.period_range.min = 40;
+//     config.period_range.max = 400;
+//     lv_monkey_t * monkey = lv_monkey_create(&config);
+
+//     /*Start monkey test*/
+//     lv_monkey_set_enable(monkey, true);
+// }
