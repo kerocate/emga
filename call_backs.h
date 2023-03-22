@@ -8,8 +8,8 @@ static void *tick_thread(void *args)
 {
     while (1)
     {
-        usleep(8 * 1000); /*Sleep for 5 millisecond*/
-        lv_tick_inc(8);   /*Tell LVGL that 5 milliseconds were elapsed*/
+        usleep(5 * 1000); /*Sleep for 5 millisecond*/
+        lv_tick_inc(5);   /*Tell LVGL that 5 milliseconds were elapsed*/
     }
 }
 
@@ -17,7 +17,7 @@ static void flush_cb(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t 
 {
     int width = lv_area_get_width(area);
     int height = lv_area_get_height(area);
-    size_t *row = &fbp[area->y1 * width + area->x1];
+    uint32_t *row = &fbp[area->y1 * width + area->x1];
     // size_t row_size = width * vinfo.bits_per_pixel / 8;
 
     // Log the width, height, framebuffer width, and row size
@@ -28,12 +28,15 @@ static void flush_cb(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t 
     // printf("Framebuffer width: %d\n", fb_width);
     // printf("Row size: %zu\n\n", row_size);
 
-    for (int y = 0; y < height; y++)
-    {
-        memcpy(row, buf, width * vinfo.bits_per_pixel / 8);
-        buf += width;
-        row += width;
-    }
+    memcpy(row, buf, width * height * vinfo.bits_per_pixel / 8);
+    // buf += width;
+
+    // for (int y = 0; y < height; y++)
+    // {
+    //     memcpy(row, buf, width * vinfo.bits_per_pixel / 8);
+    //     buf += width;
+    //     row += width;
+    // }
     fsync(lcdfd);
     lv_disp_flush_ready(disp_drv);
 }
@@ -64,27 +67,33 @@ static void touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
             {
                 pressed = 1;
                 data->state = LV_INDEV_STATE_PR;
-                lv_event_send(lv_indev_get_obj_act(),LV_EVENT_VALUE_CHANGED,NULL);
+                lv_event_send(lv_indev_get_obj_act(), LV_EVENT_PRESSED, NULL);
             }
             else
             {
                 pressed = 0;
                 data->state = LV_INDEV_STATE_REL;
-                lv_event_send(lv_indev_get_obj_act(),LV_EVENT_VALUE_CHANGED,NULL);
+                lv_event_send(lv_indev_get_obj_act(), LV_EVENT_RELEASED, NULL);
             }
         }
     }
     else if (tc_ev.type == EV_ABS)
     {
         if (tc_ev.code == ABS_Y)
+        {
             data->point.y = tc_ev.value;
+            // lv_event_send(lv_indev_get_obj_act(), LV_EVENT_VALUE_CHANGED, NULL);
+        }
         if (tc_ev.code == ABS_X)
+        {
             data->point.x = tc_ev.value;
-    }
-    if (pressed == 1)
-    {
-        data->state = LV_INDEV_STATE_PR;
-        lv_event_send(lv_indev_get_obj_act(),LV_EVENT_PRESSING,NULL);
+            // lv_event_send(lv_indev_get_obj_act(), LV_EVENT_VALUE_CHANGED, NULL);
+        }
+        if (pressed == 1)
+        {
+            data->state = LV_INDEV_STATE_PR;
+            lv_event_send(lv_indev_get_obj_act(), LV_EVENT_PRESSING, NULL);
+        }
     }
     // printf("state: %d\n", data->state);
     // printf("x: %d\n", data->point.x);

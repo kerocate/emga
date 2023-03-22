@@ -76,7 +76,7 @@ static void open_touch()
         printf("open touch fail!\n");
         // exit(0x13);
     }
-    // ioctl(tc_fd, FIONBIO, 1);
+    ioctl(tc_fd, FIONBIO, 1);
 }
 
 static void close_touch(){

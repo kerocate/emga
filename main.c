@@ -1,9 +1,11 @@
 #include "main.h"
 #include "lvgl/lvgl.h"
 
-static lv_disp_draw_buf_t disp_buf;
 static lv_disp_drv_t disp_drv; /*A variable to hold the drivers. Must be static or global.*/
-static lv_color_t buf1[SCREEN_WIDTH * SCREEN_HEIGHT / 10], buf2[SCREEN_WIDTH * SCREEN_HEIGHT / 10];
+static lv_disp_draw_buf_t disp_buf;
+// static lv_color_t buf1[SCREEN_WIDTH * 10];
+static lv_color_t buf1[SCREEN_WIDTH * SCREEN_HEIGHT];
+static lv_color_t buf2[SCREEN_WIDTH * 10];
 
 static lv_indev_drv_t indev_drv;
 lv_indev_t *indev_touchpad;
@@ -64,8 +66,10 @@ int main(int argc, char const *argv[])
 
     // Register the display
     /*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL instead buf_2 */
-    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, SCREEN_WIDTH * SCREEN_HEIGHT / 10);
-    lv_disp_drv_init(&disp_drv);   /*Basic initialization*/
+    lv_disp_drv_init(&disp_drv); /*Basic initialization*/
+    disp_drv.direct_mode = 1;
+    // lv_disp_draw_buf_init(&disp_buf, buf1, buf2, SCREEN_WIDTH * 10);
+    lv_disp_draw_buf_init(&disp_buf, buf1, NULL, SCREEN_WIDTH * SCREEN_HEIGHT);
     disp_drv.draw_buf = &disp_buf; /*Set an initialized buffer*/
     disp_drv.flush_cb = flush_cb;  /*Set a flush callback to draw to the display*/
     disp_drv.hor_res = vinfo.xres; /*Set the horizontal resolution in pixels*/
@@ -89,12 +93,12 @@ int main(int argc, char const *argv[])
     lv_group_add_obj(group, lv_scr_act());
     lv_indev_set_group(indev_touchpad, group);
 
-    int res = pthread_create(&mythread1, NULL, tick_thread, NULL);
-    if (res != 0)
-    {
-        printf("thread create faild! \n");
-        // exit(0x20);
-    }
+    // int res = pthread_create(&mythread1, NULL, tick_thread, NULL);
+    // if (res != 0)
+    // {
+    //     printf("thread create faild! \n");
+    //     // exit(0x20);
+    // }
 
     // todo: file system
     open_path();
@@ -115,7 +119,9 @@ int main(int argc, char const *argv[])
 
     while (1)
     {
-        lv_timer_handler_run_in_period(8); /* run lv_timer_handler() every 5ms */
+        usleep(10 * 1000);                  /*Sleep for 5 millisecond*/
+        lv_tick_inc(10);                    /*Tell LVGL that 5 milliseconds were elapsed*/
+        lv_timer_handler_run_in_period(10); /* run lv_timer_handler() every 5ms */
         // usleep(5 * 1000);                  /* delay 5ms to avoid unnecessary polling */
         // flush_cb(disp,)
         // read(tc_fd, &tc_ev, sizeof(tc_ev));
