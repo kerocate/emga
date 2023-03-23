@@ -11,8 +11,8 @@ static void *tick_thread(void *args)
 {
     while (1)
     {
-        usleep(8 * 1000); /*Sleep for 5 millisecond*/
-        lv_tick_inc(8);   /*Tell LVGL that 5 milliseconds were elapsed*/
+        usleep(20 * 1000); /*Sleep for 5 millisecond*/
+        lv_tick_inc(20);   /*Tell LVGL that 5 milliseconds were elapsed*/
         // lv_timer_handler();
         // lv_timer_handler();
         // timer_start();     /*Restart the timer where lv_tick_inc() is called*/

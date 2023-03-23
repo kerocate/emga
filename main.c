@@ -13,18 +13,33 @@ static lv_indev_t *indev_touchpad;
 static lv_fs_dir_t dir;
 static lv_fs_res_t res;
 static char files[256][256];
+static char path[266];
 
 #include "call_backs.h"
-#include "layout/base_layout.h"
+// #include "layout/base_layout.h"
+// #include "layout/content_section.h"
 
 void open_path()
 {
     res = lv_fs_dir_open(&dir, "S:/images");
-    // if (res != LV_FS_RES_OK)
-    // {
-    //     perror("can't open the path\n");
-    //     // exit(0x21);
-    // }
+    if (res == LV_FS_RES_HW_ERR)
+    {
+        perror("1");
+    }
+    if (res == LV_FS_RES_NOT_IMP)
+    {
+        perror("2");
+    }
+    if (res == LV_FS_RES_UNKNOWN)
+    {
+        perror("3");
+    }
+
+    if (res != LV_FS_RES_OK)
+    {
+        perror("can't open the path\n");
+        // exit(0x21);
+    }
 }
 
 void close_path()
@@ -39,18 +54,18 @@ void read_all_files()
     while (1)
     {
         res = lv_fs_dir_read(&dir, fn);
-        // if (res != LV_FS_RES_OK)
-        // {
-        //     printf("read files error at: %d\n", count);
-        //     // exit(0x22);
-        // }
+        if (res != LV_FS_RES_OK)
+        {
+            printf("read files error at: %d\n", count);
+            // exit(0x22);
+        }
         /*fn is empty, if not more files to read*/
         if (strlen(fn) == 0)
         {
             break;
         }
         strcpy(files[count], fn);
-        printf("%s\n", fn);
+        printf("%s\n", files[count]);
         count++;
     }
 }
@@ -106,20 +121,29 @@ int main(int argc, char const *argv[])
     // todo: file system
     open_path();
     read_all_files();
-    
+
+    lv_obj_t *my_img;
+    my_img = lv_img_create(lv_scr_act());
+    sprintf(path,"S:/images/%s\0",files[0]);
+    printf("%s\n",path);
+
+    lv_img_set_src(my_img, path);
+
+
     //--------------------- UI -----------------------//
-    //?style here
-    init_base_style();
+    // //?style here
+    // init_base_style();
 
-    //?layout here
-    base_layout();
-
+    // //?layout here
+    // base_layout();
+    // test_section();
+    // bing_wallpaper_CyprusMaze_1920x1080.jpg
     //--------------------- UI -----------------------//
 
     while (1)
     {
-        lv_timer_handler_run_in_period(8);
-        usleep(8 * 1000); /*Sleep for 5 millisecond*/
+        lv_timer_handler_run_in_period(20);
+        usleep(20 * 1000); /*Sleep for 5 millisecond*/
     }
 
     close_path();
