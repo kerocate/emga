@@ -65,7 +65,7 @@ void read_all_files()
             break;
         }
         strcpy(files[count], fn);
-        printf("%s\n", files[count]);
+        // printf("%s\n", files[count]);
         count++;
     }
 }
@@ -118,17 +118,26 @@ int main(int argc, char const *argv[])
     //     // exit(0x20);
     // }
 
-    // todo: file system
+    // // todo: file system
     open_path();
     read_all_files();
+    sprintf(path, "S:/images/%s\0", files[0]);
 
-    lv_obj_t *my_img;
-    my_img = lv_img_create(lv_scr_act());
-    sprintf(path,"S:/images/%s\0",files[0]);
-    printf("%s\n",path);
+    static lv_img_t *img_array[3];
+    img_array[0] = (lv_img_t *)lv_img_create(lv_scr_act());
+    img_array[1] = (lv_img_t *)lv_img_create(lv_scr_act());
+    img_array[2] = (lv_img_t *)lv_img_create(lv_scr_act());
 
-    lv_img_set_src(my_img, path);
+    lv_img_set_src((lv_obj_t *)img_array[2], path);
+    lv_img_set_size_mode((lv_obj_t *)img_array[2], LV_IMG_SIZE_MODE_REAL); //默认模式下trasform和setsize会导致双重缩放，和截断
+    // lv_obj_set_width((lv_obj_t *)img_array[2],LV_SIZE_CONTENT);
+    // lv_obj_set_height((lv_obj_t *)img_array[2],LV_SIZE_CONTENT);
+    // lv_obj_set_style_transform_zoom((lv_obj_t *)img_array[2],(uint16_t)(256 * ((float)800 / img_array[2]->w)),0); //只用这个和禁用滚动是一种实现
+    lv_img_set_pivot((lv_obj_t *)img_array[2], 0,0); //?图片会消失是因为没设置锚点
+    lv_img_set_zoom((lv_obj_t *)img_array[2], (uint16_t)(512 * ((float)800 / img_array[2]->w))); //?为什么会消失？因为没设置锚点 LV_IMG_SIZE_MODE_REAL + zoom会变成几小块
 
+    printf("width: %d\n", img_array[2]->w);
+    printf("scale: %d\n",(uint16_t)(256 * ((float)800 / img_array[2]->w)));
 
     //--------------------- UI -----------------------//
     // //?style here
@@ -150,4 +159,49 @@ int main(int argc, char const *argv[])
     close_touch();
     close_framebuffer_device(screensize);
     return 0;
+}
+
+int count_files()
+{
+    int ans;
+    for (ans = 0; files[ans][0] != '\0'; ans++)
+    {
+    }
+    return ans;
+}
+
+void sweep()
+{
+    // 图片切换事件
+    enum
+    {
+        sweep_up,
+        sweep_down,
+        sweep_left,
+        sweep_right
+    };
+    int marker = 0; // 文件夹的第marker文件，记录当前读取状态
+    // todo:手势方向播放动画
+    if (sweep_right || sweep_down)
+    {
+        marker--;
+    }
+    else
+    {
+        marker++;
+    }
+    // todo:播放切换动画，更改layer zindex
+    // todo:读取文件
+    if (marker == 0)
+    {
+        // 禁止前预读取
+    }
+    else if (marker + 1 > count_files())
+    {
+        // 禁止后预读取
+    }
+    else
+    {
+        // 从第marker文件开始，读取与其相邻的共3个图片文件
+    }
 }

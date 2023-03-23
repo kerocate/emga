@@ -38,7 +38,7 @@ struct fb_fix_screeninfo finfo;
 
 static size_t open_framebuffer_device(void)
 {
-    int fd = open("/dev/fb0", O_RDWR | O_ASYNC | O_NONBLOCK);
+    int fd = open("/dev/fb0", O_RDWR | O_NONBLOCK | O_ASYNC);
     if (fd == -1)
     {
         perror("Error: cannot open framebuffer device");
@@ -73,7 +73,7 @@ static void close_framebuffer_device(size_t screensize)
 
 static void open_touch()
 {
-    tc_fd = open("/dev/input/event0", O_RDWR | O_ASYNC | O_NONBLOCK);
+    tc_fd = open("/dev/input/event0", O_RDWR | O_NONBLOCK); //| O_ASYNC
     if (tc_fd < 0)
     {
         printf("open touch fail!\n");
