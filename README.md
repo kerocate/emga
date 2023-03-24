@@ -2,7 +2,7 @@
 
 My GEC6818 LVGL8.3 Porting.
 
-## Buildi
+## Build
 1. download lvgl-8.3 source.
 2. unpack into the project root folder.
 3. Just CMake!
