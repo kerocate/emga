@@ -127,17 +127,26 @@ int main(int argc, char const *argv[])
     img_array[0] = (lv_img_t *)lv_img_create(lv_scr_act());
     img_array[1] = (lv_img_t *)lv_img_create(lv_scr_act());
     img_array[2] = (lv_img_t *)lv_img_create(lv_scr_act());
+    // lv_obj_set_size((lv_obj_t *)img_array[2],800,480);
 
+    /**
+     * 图片缩放功能实现：
+     * 1. 设置图片
+     * 2. 使用transform_zoom缩放
+     * 3. 使用style设置宽度
+    */
+    // lv_img_set_size_mode((lv_obj_t *)img_array[2], LV_IMG_SIZE_MODE_VIRTUAL); //默认模式下trasform和setsize会导致双重缩放，和截断 LV_IMG_SIZE_MODE_VIRTUAL/LV_IMG_SIZE_MODE_REAL
     lv_img_set_src((lv_obj_t *)img_array[2], path);
-    lv_img_set_size_mode((lv_obj_t *)img_array[2], LV_IMG_SIZE_MODE_REAL); //默认模式下trasform和setsize会导致双重缩放，和截断
     // lv_obj_set_width((lv_obj_t *)img_array[2],LV_SIZE_CONTENT);
     // lv_obj_set_height((lv_obj_t *)img_array[2],LV_SIZE_CONTENT);
-    // lv_obj_set_style_transform_zoom((lv_obj_t *)img_array[2],(uint16_t)(256 * ((float)800 / img_array[2]->w)),0); //只用这个和禁用滚动是一种实现
-    lv_img_set_pivot((lv_obj_t *)img_array[2], 0,0); //?图片会消失是因为没设置锚点
-    lv_img_set_zoom((lv_obj_t *)img_array[2], (uint16_t)(512 * ((float)800 / img_array[2]->w))); //?为什么会消失？因为没设置锚点 LV_IMG_SIZE_MODE_REAL + zoom会变成几小块
+    lv_obj_set_style_transform_zoom((lv_obj_t *)img_array[2],(uint16_t)(256 * ((float)800 / img_array[2]->w)),0); //只用zoom和禁用滚动是一种实现
+    lv_obj_set_style_width((lv_obj_t *)img_array[2],800,0);
+    lv_obj_set_style_height((lv_obj_t *)img_array[2],480,0);
+    // lv_img_set_pivot((lv_obj_t *)img_array[2], 0,0); //?图片会消失是因为没设置锚点
+    // lv_img_set_zoom((lv_obj_t *)img_array[2], (uint16_t)(256 * ((float)800 / img_array[2]->w))); //?为什么会消失？因为没设置锚点 LV_IMG_SIZE_MODE_REAL + zoom会变成几小块？
 
-    printf("width: %d\n", img_array[2]->w);
-    printf("scale: %d\n",(uint16_t)(256 * ((float)800 / img_array[2]->w)));
+    // printf("width: %d\n", img_array[2]->w);
+    // printf("scale: %d\n",(uint16_t)(256 * ((float)800 / img_array[2]->w)));
 
     //--------------------- UI -----------------------//
     // //?style here
