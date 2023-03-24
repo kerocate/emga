@@ -220,3 +220,33 @@ void lv_example_anim_1(lv_obj_t *anc)
 //     /*Start monkey test*/
 //     lv_monkey_set_enable(monkey, true);
 // }
+
+void prv_img(lv_event_t *e)
+{
+    char this_path[266];
+    if (mark <= 0)
+    {
+        printf("no more prv\n");
+        return;
+    }
+    int this_mark = mark - 1;
+    sprintf(this_path, "S:/images/%s\0", files[this_mark]);
+    printf("path: %s\n", this_path);
+    lv_img_set_src(img, this_path);
+    mark--;
+}
+
+void nxt_img(lv_event_t *e)
+{
+    char this_path[266];
+    int nxt_mark = mark + 1;
+    if (files[nxt_mark][0] == '\0')
+    {
+        printf("no more nxt\n");
+        return;
+    }
+    sprintf(this_path, "S:/images/%s\0", files[nxt_mark]);
+    printf("path: %s\n", this_path);
+    lv_img_set_src(img, this_path);
+    mark++;
+}

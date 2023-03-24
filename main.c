@@ -14,6 +14,11 @@ static lv_fs_dir_t dir;
 static lv_fs_res_t res;
 static char files[256][256];
 static char path[266];
+static char reload_path[3][266];
+
+static int mark = 0;
+
+static lv_obj_t *img;
 
 #include "call_backs.h"
 // #include "layout/base_layout.h"
@@ -121,28 +126,53 @@ int main(int argc, char const *argv[])
     // // todo: file system
     open_path();
     read_all_files();
-    sprintf(path, "S:/images/%s\0", files[0]);
+    sprintf(path, "S:/images/%s\0", files[mark]);
 
-    static lv_img_t *img_array[3];
-    img_array[0] = (lv_img_t *)lv_img_create(lv_scr_act());
-    img_array[1] = (lv_img_t *)lv_img_create(lv_scr_act());
-    img_array[2] = (lv_img_t *)lv_img_create(lv_scr_act());
-    // lv_obj_set_size((lv_obj_t *)img_array[2],800,480);
+    img = lv_img_create(lv_scr_act());
+    lv_obj_align(img, LV_ALIGN_CENTER, 0,0);
+    lv_img_set_size_mode(img, LV_IMG_SIZE_MODE_REAL);
+    lv_img_set_src(img, path);
+
+    lv_obj_t *label;
+
+    lv_obj_t *btn1 = lv_btn_create(lv_scr_act());
+    lv_obj_add_event_cb(btn1, prv_img, LV_EVENT_CLICKED, NULL);
+    lv_obj_align(btn1, LV_ALIGN_CENTER, -300, +180);
+
+    label = lv_label_create(btn1);
+    lv_label_set_text(label, "<");
+    lv_obj_center(label);
+
+    lv_obj_t *btn2 = lv_btn_create(lv_scr_act());
+    lv_obj_add_event_cb(btn2, nxt_img, LV_EVENT_CLICKED, NULL);
+    lv_obj_align(btn2, LV_ALIGN_CENTER, +300, +180);
+
+    label = lv_label_create(btn2);
+    lv_label_set_text(label, ">");
+    lv_obj_center(label);
+
+    // static lv_img_t *img_array[3];
+    // img_array[0] = (lv_img_t *)lv_img_create(lv_scr_act());
+    // img_array[1] = (lv_img_t *)lv_img_create(lv_scr_act());
+    // img_array[2] = (lv_img_t *)lv_img_create(lv_scr_act());
+    // lv_img_set_size_mode((lv_obj_t *)img_array[0], LV_IMG_SIZE_MODE_REAL);
+    // lv_img_set_size_mode((lv_obj_t *)img_array[1], LV_IMG_SIZE_MODE_REAL);
+    // lv_img_set_size_mode((lv_obj_t *)img_array[2], LV_IMG_SIZE_MODE_REAL);
 
     /**
      * 图片缩放功能实现：
      * 1. 设置图片大小模式为真实
      * 2. 使用transform_zoom缩放
      * 3. 使用style设置宽高
-    */
-    lv_img_set_size_mode((lv_obj_t *)img_array[2], LV_IMG_SIZE_MODE_REAL); //默认模式下trasform和setsize会导致双重缩放，和截断 LV_IMG_SIZE_MODE_VIRTUAL/LV_IMG_SIZE_MODE_REAL
-    lv_img_set_src((lv_obj_t *)img_array[2], path);
-    lv_obj_set_style_transform_zoom((lv_obj_t *)img_array[2],(uint16_t)(256 * ((float)800 / img_array[2]->w)),0); //只用zoom和禁用滚动是一种实现
-    lv_obj_clear_flag((lv_obj_t *)img_array[2], LV_OBJ_FLAG_SCROLLABLE);
+     */
+    // lv_img_set_size_mode((lv_obj_t *)img_array[2], LV_IMG_SIZE_MODE_REAL); // 默认模式下trasform和setsize会导致双重缩放，和截断 LV_IMG_SIZE_MODE_VIRTUAL/LV_IMG_SIZE_MODE_REAL
+    // lv_img_set_src((lv_obj_t *)img_array[2], path);
+    // lv_obj_set_style_transform_zoom((lv_obj_t *)img_array[2],(uint16_t)(256 * ((float)800 / img_array[2]->w)),0); //只用zoom和禁用滚动是一种实现
+    // lv_obj_clear_flag((lv_obj_t *)img_array[2], LV_OBJ_FLAG_SCROLLABLE);
     // lv_img_set_pivot((lv_obj_t *)img_array[2], 0,0); //?图片会消失是因为没设置锚点
     // lv_img_set_zoom((lv_obj_t *)img_array[2], (uint16_t)(256 * ((float)800 / img_array[2]->w))); //?为什么会消失？因为没设置锚点 LV_IMG_SIZE_MODE_REAL + zoom会变成几小块？
 
-    printf("img width: %d, zoom: %d\n",img_array[2]->w,img_array[2]->zoom);
+    // printf("img width: %d, zoom: %d\n",img_array[2]->w,img_array[2]->zoom);
     // printf("obj width: %d, zoom: %d\n",(lv_obj_t *)img_array[2]. ,img_array[2]->zoom);
 
     //--------------------- UI -----------------------//
